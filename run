@@ -1,0 +1,1 @@
+java -jar /root/musicapi/quanlynhac.jar -Dspring.config.location=/root/musicapi/application.properties -Xms512M -Xmx1024M -server -XX:+UseParallelGC

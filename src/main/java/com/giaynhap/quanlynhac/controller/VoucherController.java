@@ -14,9 +14,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*; 
 import java.nio.ByteBuffer;
 import java.time.LocalDateTime;
-import java.util.Optional;
 import java.util.UUID;
-import org.hibernate.exception.ConstraintViolationException; 
  
  
  

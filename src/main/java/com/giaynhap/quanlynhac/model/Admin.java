@@ -17,7 +17,7 @@ public class Admin {
     @Column(name = "uuid",length=100)
     private String UUID;
     @Column(name="username",length=255)
-    private String account;
+    private String username;
     @Column(name = "password", length=255)
     private  String password;
     @JsonSerialize(using = LocalDateTimeSerializer.class)
@@ -36,12 +36,12 @@ public class Admin {
         this.UUID = UUID;
     }
 
-    public String getAccount() {
-        return account;
+    public String getUsername() {
+        return username;
     }
 
-    public void setAccount(String account) {
-        this.account = account;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getPassword() {

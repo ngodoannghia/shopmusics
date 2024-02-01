@@ -66,10 +66,10 @@ public class JwtTokenUtil implements Serializable {
 
     public String generateToken(Admin user) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("username",user.getAccount());
+        claims.put("username",user.getUsername());
         claims.put("uuid",user.getUUID());
         claims.put("admin",true);
-        return doGenerateToken(claims, user.getAccount());
+        return doGenerateToken(claims, user.getUsername());
     }
 
     private String doGenerateToken(Map<String, Object> claims, String subject) {

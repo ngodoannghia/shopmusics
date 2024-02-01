@@ -15,29 +15,14 @@ import org.springframework.web.multipart.MultipartFile;
 import java.awt.image.BufferedImage;
 import java.util.*;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.net.URL;
-import java.nio.channels.Channels;
-import java.nio.channels.FileChannel;
-import java.nio.channels.WritableByteChannel;
-import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.data.repository.query.Param;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletResponse;
-import javax.sound.sampled.AudioFileFormat;
-import javax.sound.sampled.AudioSystem;
 import java.io.*;
 @RestController
 public class UtilController {
@@ -75,6 +60,8 @@ public class UtilController {
         stream.close();
        //
         String avatarUrl = constant.hostImage+"/util/avatar/"+uuid;
+        System.out.println("Server file: " + serverFile);
+        
     try {
         amazonClientService.uploadFileToRemote(appConstant.photo, "avatar." + uuid + ".jpg", serverFile);
         if (appConstant.disableStream.equals("true")){

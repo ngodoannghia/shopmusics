@@ -8,19 +8,15 @@ import com.giaynhap.quanlynhac.dto.MusicCategoryResult;
 import com.giaynhap.quanlynhac.manager.MusicManager;
 import com.giaynhap.quanlynhac.model.*;
 import com.giaynhap.quanlynhac.service.*;
-import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
-import javax.servlet.http.HttpServletResponse;
 
-import java.io.File;
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.Optional;
-import java.util.UUID;
+
+import javax.servlet.http.HttpServletResponse;
 
 @RestController
 public class MusicController {

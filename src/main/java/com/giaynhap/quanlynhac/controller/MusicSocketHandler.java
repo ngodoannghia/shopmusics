@@ -1,9 +1,6 @@
 package com.giaynhap.quanlynhac.controller;
 
-import com.giaynhap.quanlynhac.config.AppConstant;
 import com.giaynhap.quanlynhac.manager.MusicManager;
-import com.giaynhap.quanlynhac.model.User;
-import com.giaynhap.quanlynhac.model.UserStore;
 import com.giaynhap.quanlynhac.service.FileService;
 import com.giaynhap.quanlynhac.service.UserService;
 import com.giaynhap.quanlynhac.util.JwtTokenUtil;
@@ -14,9 +11,7 @@ import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
 
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
-import java.util.List;
+
 @Component
 public class MusicSocketHandler implements WebSocketHandler {
     @Autowired

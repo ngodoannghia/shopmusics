@@ -11,7 +11,7 @@ import java.util.List;
 public interface AdminSevice {
     Admin getByUserName(String userName);
     Admin getByUUID(String uuid);
-     Page<PenddingBuy> getPagePenddingBuy(int page, int limit);
+    Page<PenddingBuy> getPagePenddingBuy(int page, int limit);
     void acceptPenddingBuy(String uuid);
     void rejectPenddingBuy(String uuid);
     PenddingBuy detailPenddingBuy(String uuid);

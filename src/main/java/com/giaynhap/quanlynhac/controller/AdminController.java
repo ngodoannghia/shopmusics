@@ -54,6 +54,7 @@ public class AdminController {
             return ResponseEntity.ok(new ApiResponse<AuthenResponse>(1, AppConstant.ERROR_MESSAGE,null));
         }
         final String token = jwtTokenUtil.generateToken(user);
+        System.out.println("jwt token: " + token);
         AuthenResponse<Admin> authenResponse = new AuthenResponse<Admin>(token);
         user.setPassword("");
         authenResponse.setUser(user);
@@ -84,7 +85,7 @@ public class AdminController {
         if (admin.getPassword() == null || admin.getPassword().isEmpty()){
             return ResponseEntity.ok(new ApiResponse<>(1, AppConstant.ERROR_MESSAGE,null));
         }
-        if (admin.getAccount() == null || admin.getAccount().isEmpty()){
+        if (admin.getUsername() == null || admin.getUsername().isEmpty()){
             return ResponseEntity.ok(new ApiResponse<>(1, AppConstant.ERROR_MESSAGE,null));
         }
         String hashString =  bHasher.hashToString(12,admin.getPassword().toCharArray());
@@ -103,13 +104,13 @@ public class AdminController {
 
     @RequestMapping(value = "/admin/add", method = RequestMethod.POST)
     public ResponseEntity<ApiResponse<?>> addAdmin(@RequestBody Admin admin){
-        UserDetails detail = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (admin.getAccount() == null || admin.getAccount().isEmpty()){
-            return ResponseEntity.ok(new ApiResponse<>(1, AppConstant.ERROR_MESSAGE,null));
-        }
-        if (admin.getPassword() == null || admin.getPassword().isEmpty()){
-            return ResponseEntity.ok(new ApiResponse<>(1, AppConstant.ERROR_MESSAGE,null));
-        }
+//        UserDetails detail = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+//        if (admin.getAccount() == null || admin.getAccount().isEmpty()){
+//            return ResponseEntity.ok(new ApiResponse<>(1, AppConstant.ERROR_MESSAGE,null));
+//        }
+//        if (admin.getPassword() == null || admin.getPassword().isEmpty()){
+//            return ResponseEntity.ok(new ApiResponse<>(1, AppConstant.ERROR_MESSAGE,null));
+//        }
         String hashString =  bHasher.hashToString(12,admin.getPassword().toCharArray());
         admin.setUUID(UUID.randomUUID().toString());
 		admin.setPassword(hashString);

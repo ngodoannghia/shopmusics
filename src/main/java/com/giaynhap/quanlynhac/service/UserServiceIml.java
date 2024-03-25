@@ -10,13 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @Component
 public class UserServiceIml implements UserService {
@@ -111,7 +106,8 @@ public class UserServiceIml implements UserService {
     }
     @Override
     public Page<User> getListUser(int page, int limit){
-        Sort typeSort =    Sort.by("create_at").descending();
+        @SuppressWarnings("unused")
+		Sort typeSort =    Sort.by("create_at").descending();
         Pageable pageable =  PageRequest.of(page, limit);
         return userRepository.findAll(pageable);
     }

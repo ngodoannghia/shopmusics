@@ -51,14 +51,14 @@ public class AdminController {
 
         final Admin user = authenticate(authenticationRequest.getUsername(),authenticationRequest.getPassword());
         if (user == null){
-            return ResponseEntity.ok(new ApiResponse<AuthenResponse>(1, AppConstant.ERROR_MESSAGE,null));
+            return ResponseEntity.ok(new ApiResponse<AuthenResponse<Admin>>(1, AppConstant.ERROR_MESSAGE,null));
         }
         final String token = jwtTokenUtil.generateToken(user);
         System.out.println("jwt token: " + token);
         AuthenResponse<Admin> authenResponse = new AuthenResponse<Admin>(token);
         user.setPassword("");
         authenResponse.setUser(user);
-        return ResponseEntity.ok(new ApiResponse<AuthenResponse>(0, AppConstant.SUCCESS_MESSAGE,authenResponse));
+        return ResponseEntity.ok(new ApiResponse<AuthenResponse<Admin>>(0, AppConstant.SUCCESS_MESSAGE,authenResponse));
     }
 
 
@@ -96,7 +96,8 @@ public class AdminController {
 	
 	@RequestMapping(value = "/admin/delete/{uuid}", method = RequestMethod.POST)
     public ResponseEntity<ApiResponse<?>> updateAdmin(@PathVariable("uuid") String uuid){
-        UserDetails detail = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        @SuppressWarnings("unused")
+		UserDetails detail = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
          adminSevice.delete(uuid);
 
         return ResponseEntity.ok(new ApiResponse<>(0, AppConstant.SUCCESS_MESSAGE,null));
@@ -121,7 +122,8 @@ public class AdminController {
 
     @RequestMapping(value = "/admin/list", method = RequestMethod.GET)
     public ResponseEntity<ApiResponse<?>> getAdmin(){
-        UserDetails detail = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        @SuppressWarnings("unused")
+		UserDetails detail = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         return ResponseEntity.ok(new ApiResponse<>(0, AppConstant.SUCCESS_MESSAGE, adminSevice.getListAdmin()));
     }
@@ -179,19 +181,21 @@ public class AdminController {
 
     @RequestMapping(value = "/admin/penddingbuy/{page}", method = RequestMethod.GET)
     public ResponseEntity<ApiResponse<?>> getListPeddingBuy( @PathVariable("page") Integer page, @RequestParam(value = "limit",required = false) Integer limit){
-        UserDetails detail = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        @SuppressWarnings("unused")
+		UserDetails detail = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         int plimit = 20;
         if (limit != null){
             plimit = limit;
         }
-        Page<PenddingBuy> origin = adminSevice.getPagePenddingBuy(page,limit);
+        Page<PenddingBuy> origin = adminSevice.getPagePenddingBuy(page,plimit);
         return ResponseEntity.ok(new ApiResponse<>(0, AppConstant.SUCCESS_MESSAGE,origin));
     }
 
     @RequestMapping(value = "/admin/penddingbuy/{uuid}/detail", method = RequestMethod.GET)
     public ResponseEntity<ApiResponse<?>> detailPenddingBuy(@PathVariable("uuid") String uuid){
-        UserDetails detail = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        @SuppressWarnings("unused")
+		UserDetails detail = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
 
         return ResponseEntity.ok(new ApiResponse<>(0, AppConstant.SUCCESS_MESSAGE,adminSevice.detailPenddingBuy(uuid)));
@@ -228,7 +232,8 @@ public class AdminController {
     }
     @RequestMapping(value = "/admin/penddingbuy/{uuid}/reject", method = RequestMethod.GET)
     public ResponseEntity<ApiResponse<?>> rejectPenddingBuy(@PathVariable("uuid") String uuid){
-        UserDetails detail = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        @SuppressWarnings("unused")
+		UserDetails detail = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         adminSevice.rejectPenddingBuy(uuid);
         return ResponseEntity.ok(new ApiResponse<>(0, AppConstant.SUCCESS_MESSAGE,null));
@@ -252,7 +257,8 @@ public class AdminController {
 
     @RequestMapping(value = "/admin/updateuser", method = RequestMethod.POST)
     public ResponseEntity<ApiResponse<?>> updateUser(@RequestBody UserInfo user){
-        UserDetails detail = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        @SuppressWarnings("unused")
+		UserDetails detail = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         UserInfo info = userService.getUserInfo(user.getUUID());
 
         info.setGender(user.getGender());
@@ -266,7 +272,8 @@ public class AdminController {
 
     @RequestMapping(value = "/admin/updatestatus/{id}/{status}", method = RequestMethod.GET)
     public ResponseEntity<ApiResponse<?>> updateUserStatus(@PathVariable("id") String id, @PathVariable("status") Integer status){
-        UserDetails detail = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        @SuppressWarnings("unused")
+		UserDetails detail = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         User user = userService.getUser(id);
         if (status == 1){
             user.setEnable(true);
@@ -292,7 +299,8 @@ public class AdminController {
     }
 	@RequestMapping(value = "/admin/getuser/{id}", method = RequestMethod.GET)
     public ResponseEntity<ApiResponse<?>> getUser(@PathVariable("id") String id){
-        UserDetails detail = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        @SuppressWarnings("unused")
+		UserDetails detail = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
          
         return ResponseEntity.ok(new ApiResponse<>(0, AppConstant.SUCCESS_MESSAGE,userService.getUser(id)));
     }
@@ -362,13 +370,15 @@ public class AdminController {
 
     @RequestMapping(value = "/admin/userstorage/detail/{id}", method = RequestMethod.GET)
     public ResponseEntity<ApiResponse<?>> getUserStorageDetail( @PathVariable("id") Long id){
-        UserDetails detail = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        @SuppressWarnings("unused")
+		UserDetails detail = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return ResponseEntity.ok(new ApiResponse<>(0, AppConstant.SUCCESS_MESSAGE,userService.getStoreById(id)));
     }
 
  @RequestMapping(value = "/admin/user/{username}", method = RequestMethod.GET)
     public ResponseEntity<ApiResponse<?>> getUserStorageDetail(@PathVariable("username") String username){
-        UserDetails detail = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        @SuppressWarnings("unused")
+		UserDetails detail = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 	 User user =   userService.getUserName(username);
 
         return ResponseEntity.ok(new ApiResponse<>(0, AppConstant.SUCCESS_MESSAGE,user ));
@@ -426,14 +436,16 @@ public class AdminController {
 
     @RequestMapping(value = "/admin/category/detail/{uuid}", method = RequestMethod.GET)
     public ResponseEntity<ApiResponse<?>> detailCategory(@PathVariable("uuid")  String uuid){
-        UserDetails detail = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        @SuppressWarnings("unused")
+		UserDetails detail = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         return ResponseEntity.ok(new ApiResponse<>(0, AppConstant.SUCCESS_MESSAGE,adminSevice.getCategory(uuid)));
     }
 
     @RequestMapping(value = "/admin/music/list/{uuid}", method = RequestMethod.GET)
     public ResponseEntity<ApiResponse<?>> listByParentId(@PathVariable("uuid")  String uuid){
-        UserDetails detail = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        @SuppressWarnings("unused")
+		UserDetails detail = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         return ResponseEntity.ok(new ApiResponse<>(0, AppConstant.SUCCESS_MESSAGE,adminSevice.listByParent(uuid)));
     }

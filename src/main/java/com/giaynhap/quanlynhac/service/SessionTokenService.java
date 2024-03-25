@@ -1,16 +1,11 @@
 package com.giaynhap.quanlynhac.service;
 
 import com.amazonaws.util.Md5Utils;
-import com.giaynhap.quanlynhac.config.AppConstant;
-import com.giaynhap.quanlynhac.model.User;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import com.sun.org.apache.xpath.internal.operations.Bool;
-import org.apache.tomcat.jni.Local;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.nio.charset.Charset;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Base64;
@@ -64,8 +59,9 @@ public class SessionTokenService {
             return null;
         }
         try {
-          ObjectToken objToken =  parseToken(token);
-          Long now =  LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+			ObjectToken objToken =  parseToken(token);
+			@SuppressWarnings("unused")
+			Long now =  LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
             if (!objToken.enable){
 				 System.out.println(" token not enable ");
 				 System.out.println(token);

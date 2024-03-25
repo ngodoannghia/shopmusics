@@ -15,7 +15,8 @@ public class FirebaseConfig {
         FileInputStream serviceAccount =
                 new FileInputStream(pathToJson);
 
-        FirebaseOptions options = new FirebaseOptions.Builder()
+        @SuppressWarnings("deprecation")
+		FirebaseOptions options = new FirebaseOptions.Builder()
                 .setCredentials(GoogleCredentials.fromStream(serviceAccount))
                 .setDatabaseUrl(databaseUrl)
                 .build();

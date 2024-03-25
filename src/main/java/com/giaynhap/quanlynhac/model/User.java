@@ -12,7 +12,6 @@ import java.time.LocalDateTime;
 @Entity(name = "user")
 @Table(name = "user")
 public class User {
-
     @Id
     @Column(name = "uuid", length=100)
     private String UUID;

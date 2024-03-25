@@ -9,7 +9,6 @@ import com.giaynhap.quanlynhac.model.*;
 import com.giaynhap.quanlynhac.service.SessionTokenService;
 import com.giaynhap.quanlynhac.service.UserServiceIml;
 import com.giaynhap.quanlynhac.service.UtilService;
-import com.giaynhap.quanlynhac.util.JwtTokenUtil;
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +18,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -56,16 +54,16 @@ public class UserController {
 		try {
 			final User user = authenticate(authenticationRequest.getUsername(),authenticationRequest.getPassword());
 			if (user == null || user.isEnable() != true){
-				return ResponseEntity.ok(new ApiResponse<AuthenResponse>(1, AppConstant.ERROR_MESSAGE,null));
+				return ResponseEntity.ok(new ApiResponse<AuthenResponse<User>>(1, AppConstant.ERROR_MESSAGE,null));
 			}
 			final String token = sessionTokenService.makeToken(user.getAccount(),user.getUUID());
 			sessionTokenService.addToken(user.getUUID(), token );
 			AuthenResponse<User> authenResponse = new AuthenResponse<User>(token);
 			user.setPassword("");
 			authenResponse.setUser(user);
-			return ResponseEntity.ok(new ApiResponse<AuthenResponse>(0, AppConstant.SUCCESS_MESSAGE,authenResponse));
+			return ResponseEntity.ok(new ApiResponse<AuthenResponse<User>>(0, AppConstant.SUCCESS_MESSAGE,authenResponse));
 		} catch (Exception e){
-			return ResponseEntity.ok(new ApiResponse<AuthenResponse>(2, e.getMessage(),null));
+			return ResponseEntity.ok(new ApiResponse<AuthenResponse<User>>(2, e.getMessage(),null));
 		}
     }
 

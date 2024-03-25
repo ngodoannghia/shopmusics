@@ -65,7 +65,8 @@ public class UtilServiceIml  implements UtilService {
                 .build();
 
         try {
-            String response = FirebaseMessaging.getInstance().send(message);
+            @SuppressWarnings("unused")
+			String response = FirebaseMessaging.getInstance().send(message);
         } catch (FirebaseMessagingException e) {
 
         }
@@ -78,7 +79,8 @@ public class UtilServiceIml  implements UtilService {
                         .build()) .setTopic("NewDemo")
                 .build();
         try {
-            String response = FirebaseMessaging.getInstance().send(message);
+            @SuppressWarnings("unused")
+			String response = FirebaseMessaging.getInstance().send(message);
         } catch (FirebaseMessagingException e) {
 
         }

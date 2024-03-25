@@ -4,14 +4,11 @@ import com.amazonaws.services.s3.model.S3ObjectInputStream;
 import com.giaynhap.quanlynhac.controller.MediaStreamer;
 import com.google.gson.Gson;
 import org.aspectj.util.FileUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
 import javax.xml.bind.DatatypeConverter;
 import java.io.*;
-import java.nio.file.Files;
 import java.security.MessageDigest;
 import java.time.LocalDateTime;
 import java.time.ZoneId;

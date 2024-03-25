@@ -3,7 +3,11 @@ package com.giaynhap.quanlynhac.dto;
 import java.io.Serializable;
 
 public class ApiResponse<T> implements Serializable {
-    private int code;
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	private int code;
     private String message;
     private T data;
 
@@ -36,7 +40,7 @@ public class ApiResponse<T> implements Serializable {
     public void setData(T data) {
         this.data = data;
     }
-    public static ApiResponse getErrorResponse(int code, String Message){
+    public static ApiResponse<Object> getErrorResponse(int code, String Message){
         return new ApiResponse<Object>(code,Message,null);
     }
 }

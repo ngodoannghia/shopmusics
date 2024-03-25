@@ -24,7 +24,8 @@ public class MusicSocketHandler implements WebSocketHandler {
     MusicManager musicManager;
     @Override
     public void afterConnectionEstablished(WebSocketSession webSocketSession) throws Exception {
-     String  token = webSocketSession.getAttributes().get("token").toString();
+     @SuppressWarnings("unused")
+	String  token = webSocketSession.getAttributes().get("token").toString();
     }
 
     @Override

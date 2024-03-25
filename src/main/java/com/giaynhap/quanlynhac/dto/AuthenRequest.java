@@ -3,7 +3,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.io.Serializable;
 
 public class AuthenRequest implements Serializable {
-     @JsonProperty("username")
+     /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	@JsonProperty("username")
     private String username;
      @JsonProperty("password")
     private String password;

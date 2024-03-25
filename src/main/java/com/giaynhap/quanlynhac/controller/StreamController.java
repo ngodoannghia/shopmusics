@@ -4,32 +4,12 @@ import com.amazonaws.services.s3.model.S3ObjectInputStream;
 import com.giaynhap.quanlynhac.config.AppConstant;
 import com.giaynhap.quanlynhac.manager.CacheQueue;
 import com.giaynhap.quanlynhac.manager.MusicManager;
-import com.giaynhap.quanlynhac.model.FileStore;
-import com.giaynhap.quanlynhac.model.Music;
-import com.giaynhap.quanlynhac.model.User;
-import com.giaynhap.quanlynhac.model.UserStore;
 import com.giaynhap.quanlynhac.service.*;
 import org.apache.catalina.connector.Response;
-import org.apache.poi.openxml4j.opc.internal.ContentType;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.repository.query.Param;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
-
-import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletResponse;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.RandomAccessFile;
-import java.nio.channels.Channels;
-import java.nio.channels.FileChannel;
-import java.nio.channels.WritableByteChannel;
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
-import java.util.Date;
-import java.util.UUID;
 
 @RestController
 public class StreamController {
@@ -60,7 +40,8 @@ public class StreamController {
         response.setHeader("Content-Disposition", "attachment; filename=" + slug + ".mp3");
         return new MediaStreamer((long) 0, null);
     }
-    @RequestMapping(value = "/stream/{id}/{uuid}/{slug}", method = RequestMethod.GET)
+    @SuppressWarnings("removal")
+	@RequestMapping(value = "/stream/{id}/{uuid}/{slug}", method = RequestMethod.GET)
     public  @ResponseBody
     StreamingResponseBody getSong(HttpServletResponse response,
                    @PathVariable("id") Long id,
@@ -148,7 +129,8 @@ public class StreamController {
 
 
 
-    @RequestMapping(value = "/demo/stream/{uuid}/{slug}", method = RequestMethod.GET)
+    @SuppressWarnings("removal")
+	@RequestMapping(value = "/demo/stream/{uuid}/{slug}", method = RequestMethod.GET)
     public  @ResponseBody
     StreamingResponseBody getDemoSongStream(HttpServletResponse response,
                                             @PathVariable("uuid") String uuid,
@@ -236,7 +218,8 @@ public class StreamController {
     }
 
 
-  @RequestMapping(value = "/admin/stream/{uuid}/{slug}", method = RequestMethod.GET)
+  @SuppressWarnings("removal")
+@RequestMapping(value = "/admin/stream/{uuid}/{slug}", method = RequestMethod.GET)
     public  @ResponseBody
     StreamingResponseBody getRealSongStream(HttpServletResponse response,
                                   @PathVariable("uuid") String uuid,

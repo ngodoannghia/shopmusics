@@ -17,8 +17,6 @@ public class AdminServiceIml implements  AdminSevice {
     @Autowired
     private PenddingBuyRepository penddingBuyRepository;
     @Autowired
-    private UserStoreRepository userStoreRepository;
-    @Autowired
     MusicRepository  musicRepository;
     @Autowired
     CategoryRepository categoryRepository;
@@ -38,10 +36,9 @@ public class AdminServiceIml implements  AdminSevice {
     }
     @Override
     public Page<PenddingBuy> getPagePenddingBuy(int page, int limit){
-        Page<Music> pageMusics = null;
         Sort typeSort =    Sort.by("createAt").descending();
         Pageable pageable =  PageRequest.of(page, limit, typeSort );
-      return   penddingBuyRepository.findAll(pageable);
+        return   penddingBuyRepository.findAll(pageable);
     }
     @Override
     public void acceptPenddingBuy(String uuid){

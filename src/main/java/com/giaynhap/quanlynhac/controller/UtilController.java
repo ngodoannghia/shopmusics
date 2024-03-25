@@ -48,7 +48,8 @@ public class UtilController {
 
     @PostMapping("/util/avatar/upload")
     public ResponseEntity<?> uploadAvatar(@RequestParam("file") MultipartFile file) throws IOException {
-        UserDetails detail = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        @SuppressWarnings("unused")
+		UserDetails detail = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String uuid = UUID.randomUUID().toString();
          byte[] bytes = file.getBytes();
         String avatarPath = constant.avatarPath ;
@@ -122,7 +123,8 @@ public class UtilController {
 
     @PostMapping("/util/photo/upload")
     public ResponseEntity<?> uploadPhoto(@RequestParam("file") MultipartFile file) throws IOException {
-        UserDetails detail = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        @SuppressWarnings("unused")
+		UserDetails detail = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String uuid = UUID.randomUUID().toString();
         byte[] bytes = file.getBytes();
         String avatarPath = constant.avatarPath ;
@@ -184,10 +186,11 @@ public class UtilController {
 
 
 
-    @PostMapping("/util/music/upload/{uuid}")
+    @SuppressWarnings({ "removal", "unused" })
+	@PostMapping("/util/music/upload/{uuid}")
     public ResponseEntity<?> uploadMusic(@RequestParam("file") MultipartFile file, @PathVariable("uuid") String uuid) throws IOException {
         UserDetails detail = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String userUuid = detail.getUsername();
+		String userUuid = detail.getUsername();
         Music music = musicService.getMusic(uuid);
 
 

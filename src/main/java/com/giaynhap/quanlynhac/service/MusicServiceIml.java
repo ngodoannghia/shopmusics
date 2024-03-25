@@ -106,7 +106,8 @@ public class MusicServiceIml implements  MusicService {
         musicRepository.deleteById(uuid);
     }
 
-    @Override
+    @SuppressWarnings("removal")
+	@Override
     public PenddingBuy buy(String userUUID, Music music,int time, String userName, Double cost) {
         PenddingBuy penddingBuy = new PenddingBuy();
         penddingBuy.setCreateAt(LocalDateTime.now());

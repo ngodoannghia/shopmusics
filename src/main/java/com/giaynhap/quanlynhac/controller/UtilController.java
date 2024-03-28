@@ -4,6 +4,8 @@ import com.giaynhap.quanlynhac.model.*;
 import com.giaynhap.quanlynhac.config.AppConstant;
 import com.giaynhap.quanlynhac.dto.ApiResponse;
 import com.giaynhap.quanlynhac.service.*;
+import com.giaynhap.quanlynhac.util.FileProcess;
+
 import net.bramp.ffmpeg.FFprobe;
 import net.bramp.ffmpeg.probe.FFmpegFormat;
 import net.bramp.ffmpeg.probe.FFmpegProbeResult;
@@ -18,7 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-
+import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 import javax.imageio.ImageIO;
@@ -26,6 +28,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 @RestController
 public class UtilController {
+	private String save_data = "src/main/resources/";
+	
     @Autowired
     UtilService utilService;
     @Autowired
@@ -46,41 +50,67 @@ public class UtilController {
     CacheService cacheService;
 
 
-    @PostMapping("/util/avatar/upload")
-    public ResponseEntity<?> uploadAvatar(@RequestParam("file") MultipartFile file) throws IOException {
-        @SuppressWarnings("unused")
+//    @PostMapping("/util/avatar/upload")
+//    public ResponseEntity<?> uploadAvatar(@RequestParam("file") MultipartFile file) throws IOException {
+//        @SuppressWarnings("unused")
+//		UserDetails detail = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+//        String uuid = UUID.randomUUID().toString();
+//         byte[] bytes = file.getBytes();
+//        String avatarPath = constant.avatarPath ;
+//        File dir = new File(avatarPath);
+//
+//        File serverFile = new File(dir.getAbsolutePath() + File.separator + "avatar."+uuid+".jpg");
+//        BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(serverFile));
+//        stream.write(bytes);
+//        stream.close();
+//        //
+//        String avatarUrl = constant.hostImage+"/util/avatar/"+uuid;
+//        System.out.println("Server file: " + serverFile);
+//        
+//	    try {
+//	        amazonClientService.uploadFileToRemote(appConstant.photo, "avatar." + uuid + ".jpg", serverFile);
+//	        if (appConstant.disableStream.equals("true")){
+//	            avatarUrl = amazonClientService.getResourceURL(appConstant.photo,"avatar." + uuid + ".jpg").toExternalForm();
+//	            if (avatarUrl != null){
+//	                avatarUrl =  avatarUrl.replace("https://","http://");
+//	            }
+//	        }
+//	    } catch ( Exception e){
+//	        System.out.println("amazon upload image error ");
+//	        e.printStackTrace();
+//	    }
+//
+//        // serverFile.delete();
+//	    cacheService.moveToCache(appConstant.photo+"/avatar."+uuid+".jpg",serverFile);
+//        return ResponseEntity.ok(new ApiResponse<String>(0, AppConstant.SUCCESS_MESSAGE,avatarUrl));
+//    }
+    
+    
+	@PostMapping("/util/avatar/upload")
+    public ResponseEntity<?> saveAvater(@RequestParam("file") MultipartFile file) throws IOException {
+		@SuppressWarnings("unused")
 		UserDetails detail = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String uuid = UUID.randomUUID().toString();
-         byte[] bytes = file.getBytes();
-        String avatarPath = constant.avatarPath ;
-        File dir = new File(avatarPath);
-
-        File serverFile = new File(dir.getAbsolutePath() + File.separator + "avatar."+uuid+".jpg");
-        BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(serverFile));
-        stream.write(bytes);
-        stream.close();
-       //
-        String avatarUrl = constant.hostImage+"/util/avatar/"+uuid;
-        System.out.println("Server file: " + serverFile);
-        
-    try {
-        amazonClientService.uploadFileToRemote(appConstant.photo, "avatar." + uuid + ".jpg", serverFile);
-        if (appConstant.disableStream.equals("true")){
-            avatarUrl = amazonClientService.getResourceURL(appConstant.photo,"avatar." + uuid + ".jpg").toExternalForm();
-            if (avatarUrl != null){
-                avatarUrl =  avatarUrl.replace("https://","http://");
-            }
-        }
-    } catch ( Exception e){
-        System.out.println("amazon upload image error ");
-        e.printStackTrace();
+		
+		boolean status_avatar = false;
+		String name_avatar = StringUtils.cleanPath(file.getOriginalFilename());	
+    	String path_avatar = "/static/avatars/" + UUID.randomUUID().toString() + "_" + name_avatar;  	
+		try {
+	    	FileProcess obj_avatar = new FileProcess(save_data + path_avatar, file);
+	    	status_avatar = obj_avatar.saveFile();
+	    	
+		} catch (Exception e) {
+	        System.out.println("save image error ");
+	        e.printStackTrace();
+		}
+		
+    	if (status_avatar) {
+    		return ResponseEntity.ok(new ApiResponse<String>(0, AppConstant.SUCCESS_MESSAGE,path_avatar));
+    	}
+    	else {
+    		return ResponseEntity.ok(new ApiResponse<String>(1, AppConstant.BAD_REQUEST_MESSAGE,""));
+    	}
     }
-
-        // serverFile.delete();
-	    cacheService.moveToCache(appConstant.photo+"/avatar."+uuid+".jpg",serverFile);
-        return ResponseEntity.ok(new ApiResponse<String>(0, AppConstant.SUCCESS_MESSAGE,avatarUrl));
-    }
-
+    
 
     @RequestMapping(value = "/util/avatar/{uuid}", method = RequestMethod.GET)
     public  @ResponseBody  StreamingResponseBody downloadAvatar(HttpServletResponse response, @PathVariable("uuid") String uuid, @RequestParam(name = "width",required = false) Integer width, @RequestParam(name = "height",required = false) Integer height) throws Exception {
@@ -121,37 +151,60 @@ public class UtilController {
 	    }
     }
 
-    @PostMapping("/util/photo/upload")
-    public ResponseEntity<?> uploadPhoto(@RequestParam("file") MultipartFile file) throws IOException {
-        @SuppressWarnings("unused")
+//    @PostMapping("/util/photo/upload")
+//    public ResponseEntity<?> uploadPhoto(@RequestParam("file") MultipartFile file) throws IOException {
+//        @SuppressWarnings("unused")
+//		UserDetails detail = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+//        String uuid = UUID.randomUUID().toString();
+//        byte[] bytes = file.getBytes();
+//        String avatarPath = constant.avatarPath ;
+//        File dir = new File(avatarPath);
+//        ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
+//        BufferedImage img =  ImageIO.read(bais);
+//        File serverFile = new File(dir.getAbsolutePath() + File.separator + "photo."+uuid+".jpg");
+//        BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(serverFile));
+//        ImageIO.write(img, "jpg", stream);
+//        stream.close();
+//      //  String avatarUrl = constant.hostImage+"/util/photo/"+uuid;
+//        String avatarUrl = constant.hostImage + "/util/photo/" + uuid;
+//        try {
+//            amazonClientService.uploadFileToRemote(appConstant.photo, "photo." + uuid + ".jpg", serverFile);
+//            avatarUrl = amazonClientService.getResourceURL(appConstant.photo, "photo." + uuid + ".jpg").toExternalForm();
+//            if (avatarUrl != null) {
+//                avatarUrl = avatarUrl.replace("https://", "http://");
+//            }
+//        }catch (Exception e){
+//            e.printStackTrace();
+//        }
+//        //serverFile.delete();
+//	    cacheService.moveToCache(appConstant.photo+"/photo."+uuid+".jpg",serverFile);
+//        return ResponseEntity.ok(new ApiResponse<String>(0, AppConstant.SUCCESS_MESSAGE,avatarUrl));
+//    }
+
+	@PostMapping("/util/photo/upload")
+    public ResponseEntity<?> savePhoto(@RequestParam("file") MultipartFile file) throws IOException {
+		@SuppressWarnings("unused")
 		UserDetails detail = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String uuid = UUID.randomUUID().toString();
-        byte[] bytes = file.getBytes();
-        String avatarPath = constant.avatarPath ;
-        File dir = new File(avatarPath);
-        ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
-        BufferedImage img =  ImageIO.read(bais);
-        File serverFile = new File(dir.getAbsolutePath() + File.separator + "photo."+uuid+".jpg");
-        BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(serverFile));
-        ImageIO.write(img, "jpg", stream);
-        stream.close();
-      //  String avatarUrl = constant.hostImage+"/util/photo/"+uuid;
-        String avatarUrl = constant.hostImage + "/util/photo/" + uuid;
-        try {
-            amazonClientService.uploadFileToRemote(appConstant.photo, "photo." + uuid + ".jpg", serverFile);
-            avatarUrl = amazonClientService.getResourceURL(appConstant.photo, "photo." + uuid + ".jpg").toExternalForm();
-            if (avatarUrl != null) {
-                avatarUrl = avatarUrl.replace("https://", "http://");
-            }
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-        //serverFile.delete();
-	    cacheService.moveToCache(appConstant.photo+"/photo."+uuid+".jpg",serverFile);
-        return ResponseEntity.ok(new ApiResponse<String>(0, AppConstant.SUCCESS_MESSAGE,avatarUrl));
+		
+		boolean status_photo = false;
+		String name_photo = StringUtils.cleanPath(file.getOriginalFilename());	
+    	String path_photo = "/static/photo/" + UUID.randomUUID().toString() + "_" + name_photo;  	
+		try {
+	    	FileProcess obj_photo = new FileProcess(save_data + path_photo, file);
+	    	status_photo = obj_photo.saveFile();
+	    	
+		} catch (Exception e) {
+	        System.out.println("save image error ");
+	        e.printStackTrace();
+		}
+		
+    	if (status_photo) {
+    		return ResponseEntity.ok(new ApiResponse<String>(0, AppConstant.SUCCESS_MESSAGE,appConstant.hostImage + path_photo));
+    	}
+    	else {
+    		return ResponseEntity.ok(new ApiResponse<String>(1, AppConstant.BAD_REQUEST_MESSAGE,""));
+    	}
     }
-
-
     @RequestMapping(value = "/util/photo/{uuid}", method = RequestMethod.GET)
     public   @ResponseBody  StreamingResponseBody  downloadPhoto(HttpServletResponse response, @PathVariable("uuid") String uuid, @RequestParam(name = "width",required = false) Integer width, @RequestParam(name = "height",required = false) Integer height) throws Exception {
             String file = appConstant.photo+"/photo."+uuid+".jpg";

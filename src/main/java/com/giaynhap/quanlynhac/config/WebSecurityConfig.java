@@ -57,6 +57,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	                    "/refreshToken",
 	                    "/admin/authenticate",
 	                    "/admin/add",
+	                    "/admin/signup",
 	                    "/makepass/*",
 	                    "/user/register",
 	                    "/music/demo/*",
@@ -76,7 +77,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	                    "/very/success",
                         "/utils/make_public/*",
                         "/utils/get_public/*",
-                        "/utils/make_demo_public/*"
+                        "/utils/make_demo_public/*",
+                        "/static/photo/*"
                         ).permitAll()
 		        .antMatchers("/ws").permitAll()
                 .anyRequest()

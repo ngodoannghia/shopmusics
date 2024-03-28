@@ -2,6 +2,7 @@ package com.giaynhap.quanlynhac.controller;
 
 import at.favre.lib.crypto.bcrypt.BCrypt;
 import com.giaynhap.quanlynhac.config.AppConstant;
+import com.giaynhap.quanlynhac.dto.AdminDTO;
 import com.giaynhap.quanlynhac.dto.ApiResponse;
 import com.giaynhap.quanlynhac.dto.AuthenRequest;
 import com.giaynhap.quanlynhac.dto.AuthenResponse;
@@ -116,6 +117,26 @@ public class AdminController {
         admin.setUUID(UUID.randomUUID().toString());
 		admin.setPassword(hashString);
 		admin.setCreate_at(LocalDateTime.now());
+        admin = adminSevice.updateAdmin(admin);
+        return ResponseEntity.ok(new ApiResponse<>(0, AppConstant.SUCCESS_MESSAGE,admin));
+    }
+    
+    @RequestMapping(value = "/admin/signup", method = RequestMethod.POST)
+    public ResponseEntity<ApiResponse<?>> signupAdmin(@RequestBody AdminDTO adminDTO){
+//        UserDetails detail = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+//        if (admin.getAccount() == null || admin.getAccount().isEmpty()){
+//            return ResponseEntity.ok(new ApiResponse<>(1, AppConstant.ERROR_MESSAGE,null));
+//        }
+//        if (admin.getPassword() == null || admin.getPassword().isEmpty()){
+//            return ResponseEntity.ok(new ApiResponse<>(1, AppConstant.ERROR_MESSAGE,null));
+//        }
+    	Admin admin = new Admin();
+        String hashString =  bHasher.hashToString(12,adminDTO.getPassword().toCharArray());
+        admin.setUUID(UUID.randomUUID().toString());
+		admin.setPassword(hashString);
+		admin.setUsername(adminDTO.getUsername());
+		admin.setCreate_at(LocalDateTime.now());
+		admin.setEnable(true);
         admin = adminSevice.updateAdmin(admin);
         return ResponseEntity.ok(new ApiResponse<>(0, AppConstant.SUCCESS_MESSAGE,admin));
     }

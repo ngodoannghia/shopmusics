@@ -432,6 +432,7 @@ public class AdminController {
 		if (category.getUUID() == null){
 			category.setUUID(UUID.randomUUID().toString());
 		}
+		category.setCreat_at(LocalDateTime.now());
         category = adminSevice.updateCategory(category);
 
         if (category != null && category.getTitle() != null) {

@@ -26,9 +26,11 @@ import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBo
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
+import org.apache.commons.io.FilenameUtils;
+
 @RestController
 public class UtilController {
-	private String save_data = "src/main/resources/";
+	private String save_data = "src/main/resources/static";
 	
     @Autowired
     UtilService utilService;
@@ -93,7 +95,7 @@ public class UtilController {
 		
 		boolean status_avatar = false;
 		String name_avatar = StringUtils.cleanPath(file.getOriginalFilename());	
-    	String path_avatar = "/static/avatars/" + UUID.randomUUID().toString() + "_" + name_avatar;  	
+    	String path_avatar = "/avatars/" + UUID.randomUUID().toString() + "_" + name_avatar;  	
 		try {
 	    	FileProcess obj_avatar = new FileProcess(save_data + path_avatar, file);
 	    	status_avatar = obj_avatar.saveFile();
@@ -187,8 +189,9 @@ public class UtilController {
 		UserDetails detail = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		
 		boolean status_photo = false;
-		String name_photo = StringUtils.cleanPath(file.getOriginalFilename());	
-    	String path_photo = "/static/photo/" + UUID.randomUUID().toString() + "_" + name_photo;  	
+		String name_photo = StringUtils.cleanPath(file.getOriginalFilename());
+		String ext = FilenameUtils.getExtension(name_photo);
+    	String path_photo = "/photo/" + UUID.randomUUID().toString() + "_" + UUID.randomUUID().toString() + '.' + ext;  	
 		try {
 	    	FileProcess obj_photo = new FileProcess(save_data + path_photo, file);
 	    	status_photo = obj_photo.saveFile();

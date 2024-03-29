@@ -78,7 +78,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                         "/utils/make_public/*",
                         "/utils/get_public/*",
                         "/utils/make_demo_public/*",
-                        "/static/photo/*"
+                        "/photo/*"
                         ).permitAll()
 		        .antMatchers("/ws").permitAll()
                 .anyRequest()

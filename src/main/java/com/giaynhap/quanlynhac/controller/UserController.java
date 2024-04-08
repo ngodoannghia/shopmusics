@@ -56,7 +56,7 @@ public class UserController {
 			if (user == null || user.isEnable() != true){
 				return ResponseEntity.ok(new ApiResponse<AuthenResponse<User>>(1, AppConstant.ERROR_MESSAGE,null));
 			}
-			final String token = sessionTokenService.makeToken(user.getAccount(),user.getUUID());
+			final String token = sessionTokenService.makeToken(user.getUsername(),user.getUUID());
 			sessionTokenService.addToken(user.getUUID(), token );
 			AuthenResponse<User> authenResponse = new AuthenResponse<User>(token);
 			user.setPassword("");
@@ -110,7 +110,15 @@ public class UserController {
     @RequestMapping(value = "/user/register", method = RequestMethod.POST)
     public ResponseEntity<?>  register(@RequestBody User user){
         UserInfo userInfo = user.getInfo();
-        if (user.getInfo() == null || user.getInfo().getFullname() == null || user.getAccount() == null || user.getPassword() == null ){
+        User _user =  userService.getUserName(user.getUsername());
+        if (_user  != null){
+            return ResponseEntity.ok(new ApiResponse<User>(1, "Username existed",null));  
+        }
+        _user = userService.getEmail(user.getEmail());
+        if (_user  != null){
+            return ResponseEntity.ok(new ApiResponse<User>(1, "Email existed",null));  
+        }
+        if (user.getEmail() == null || user.getInfo().getFullname() == null || user.getUsername() == null || user.getPassword() == null ){
             return ResponseEntity.ok(new ApiResponse<User>(1, AppConstant.ERROR_MESSAGE,null));
         }
         user.setUUID(UUID.randomUUID().toString());
@@ -123,7 +131,7 @@ public class UserController {
         user.setPassword(hashString);
         user.setCreate_at(LocalDateTime.now());
         user.setEnable(false);
-        utilService.sendVeryEmail(sessionTokenService.makeToken(user.getAccount(),userInfo.getUUID(),false,"register"),user.getAccount());
+        utilService.sendVeryEmail(sessionTokenService.makeToken(user.getUsername(),userInfo.getUUID(),false,"register"),user.getEmail(), user.getUsername());
         try {
             userService.update(user);
         }catch (ConstraintViolationException e){
@@ -158,13 +166,13 @@ public class UserController {
     @RequestMapping(value = "/user/forget/sendemail/{email}", method = RequestMethod.GET)
     public ResponseEntity<?>  sendEmailForgetPassword(@PathVariable("email") String email){
         String toEmail = email;
-        User user =   userService.getUserName(toEmail);
+        User user =   userService.getEmail(toEmail);
 
         if (user  == null){
-            return ResponseEntity.ok(new ApiResponse<UserInfo>(1, AppConstant.ERROR_MESSAGE,null));
+            return ResponseEntity.ok(new ApiResponse<UserInfo>(1, "User chưa cập nhật thông tin email", null));
         }
 
-        utilService.sendVeryEmail(sessionTokenService.makeToken(user.getAccount(),user.getUUID(),false,"forget"),user.getAccount());
+        utilService.sendVeryEmail(sessionTokenService.makeToken(user.getUsername(),user.getUUID(),false,"forget"),toEmail, user.getUsername());
         return ResponseEntity.ok(new ApiResponse<UserInfo>(0, AppConstant.SUCCESS_MESSAGE,null));
     }
     @RequestMapping(value = "/very/email", method = RequestMethod.GET)
@@ -185,8 +193,8 @@ public class UserController {
 					String hashString =  bHasher.hashToString(12,newPass.toCharArray());
 					user.setPassword(hashString);
 					userService.update(user);
-					utilService.sendVeryLostPassword(newPass,user.getAccount());
-					response.sendRedirect(constant.hostImage + "/very/success");
+					utilService.sendVeryLostPassword(newPass,user.getEmail());
+					response.sendRedirect(constant.hostServer + "very/success");
 
 					return "<h2>Xác thực thành công</h2><br><div>Mật khẩu đã được gửi tới email của bạn</div>";
 				}

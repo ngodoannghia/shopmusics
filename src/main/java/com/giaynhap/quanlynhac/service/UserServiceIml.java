@@ -33,6 +33,10 @@ public class UserServiceIml implements UserService {
         return (User)userRepository.findByUserName(username);
     }
     @Override
+    public User getEmail(String email){
+        return (User)userRepository.findByEmail(email);
+    }
+    @Override
     public User update(User user) {
         //userInfoRepository.save(user.getInfo());
         return  userRepository.save(user);

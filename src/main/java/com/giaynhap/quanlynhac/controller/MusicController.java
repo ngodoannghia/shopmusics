@@ -8,6 +8,8 @@ import com.giaynhap.quanlynhac.dto.MusicCategoryResult;
 import com.giaynhap.quanlynhac.manager.MusicManager;
 import com.giaynhap.quanlynhac.model.*;
 import com.giaynhap.quanlynhac.service.*;
+import com.giaynhap.quanlynhac.util.CustomUserDetail;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -35,7 +37,7 @@ public class MusicController {
     AmazonClientService amazonClientService;
 
     @RequestMapping(value = "/music/demo/{page}", method = RequestMethod.GET)
-    public ApiResponse<?> getDemoList(@PathVariable  int page,
+    public ApiResponse<?> getDemoList(@PathVariable("page")  int page,
                                    @RequestParam(value = "limit",required = false) Optional<Integer> limit,
                                    @RequestParam(value = "sortType",required = false) Optional<String> sortType
                             ){
@@ -51,7 +53,7 @@ public class MusicController {
         return  new ApiResponse<>(0,AppConstant.SUCCESS_MESSAGE,musicService.pageMusic(AppConstant.MusicType.DEMO,page,pageLimit,pageSortType));
     }
     @RequestMapping(value = "/music/category/{uuid}/{page}", method = RequestMethod.GET)
-    public ApiResponse<?> getDemoCategoryList(@PathVariable  int page,
+    public ApiResponse<?> getDemoCategoryList(@PathVariable("page")  int page,
                                               @PathVariable("uuid")  String category,
                                       @RequestParam(value = "limit",required = false) Optional<Integer> limit,
                                       @RequestParam(value = "sortType",required = false) Optional<String> sortType
@@ -80,12 +82,12 @@ public class MusicController {
 
 
     @RequestMapping(value = "/music/detail/{uuid}", method = RequestMethod.GET)
-    public ApiResponse<?> getMusic(@PathVariable  String uuid){
+    public ApiResponse<?> getMusic(@PathVariable("uuid")  String uuid){
         return  new ApiResponse<>(0,AppConstant.SUCCESS_MESSAGE,musicService.getMusic(uuid));
     }
 
     @RequestMapping(value = "/music/{page}", method = RequestMethod.GET)
-    public ApiResponse<?> getMusicList(@PathVariable  int page,
+    public ApiResponse<?> getMusicList(@PathVariable("page")  int page,
                                       @RequestParam(value = "limit",required = false) Optional<Integer> limit,
                                       @RequestParam(value = "sortType",required = false) Optional<String> sortType
     ){
@@ -102,7 +104,7 @@ public class MusicController {
     }
 
     @RequestMapping(value = "/music/storage/{page}", method = RequestMethod.GET)
-    public ApiResponse<?> getStorage(@PathVariable  int page,
+    public ApiResponse<?> getStorage(@PathVariable("page")  int page,
                                       @RequestParam(value = "limit",required = false) Optional<Integer> limit,
                                      @RequestParam(value = "status",required = false) Optional<Integer> status
     ){
@@ -125,6 +127,8 @@ public class MusicController {
     @RequestMapping(value = "/music/buy", method = RequestMethod.POST)
     public ApiResponse<?>  buyMusic(@RequestBody BuyModel buyMusic){
         UserDetails detail = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        System.out.println(buyMusic.getUUID());
 
         Music music = musicService.getMusic(buyMusic.getUUID());
 
@@ -163,7 +167,7 @@ public class MusicController {
     }
     @RequestMapping(value = "/music/getResource/{uuid}", method = RequestMethod.GET)
     public ApiResponse<?> getMusicResource(@PathVariable String uuid,final HttpServletResponse httpResponse) throws  java.io.IOException{
-
+        
         Music music = musicService.getMusic(uuid);
         if (music == null){
             return new ApiResponse<>(3,AppConstant.ERROR_MESSAGE,null);
@@ -172,19 +176,23 @@ public class MusicController {
         if (music.getType() == AppConstant.MusicType.DEMO.getValue()){
             String urlResource = "";
             if (appConstant.disableStream.equals("true")) {
-                urlResource = appConstant.hostAudio + "/demo/stream/" + music.getUUID() + "/" + music.getSlug() + ".mp3";
+                urlResource = appConstant.hostServer + "demo/stream/" + music.getUUID() + "/" + music.getSlug() + ".mp3";
             } else {
-                urlResource = amazonClientService.getResourceURL(fileService.getDemoSong(music.getUUID())).toExternalForm();
-                if (urlResource != null){
-                    urlResource =  urlResource.replace("https://","http://");
-                }
+                // urlResource = amazonClientService.getResourceURL(fileService.getDemoSong(music.getUUID())).toExternalForm();
+                // if (urlResource != null){
+                //     urlResource =  urlResource.replace("https://","http://");
+                // }
+                urlResource = appConstant.hostAudio + fileService.getDemoSong(music.getUUID());
             }
             return new ApiResponse<>(0,AppConstant.SUCCESS_MESSAGE,urlResource);
         }
+        System.out.println("Vao ==================");
         UserDetails detail = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        System.out.println("Done ==============");
+        System.out.println(detail);
 		if (detail == null){
  			httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED, "401");
-			 return new ApiResponse<>(401,AppConstant.ERROR_MESSAGE,null);
+			 return new ApiResponse<>(401,AppConstant.ERROR_MESSAGE,null); 
 		}
         UserStore store = userService.getStoreMusic(uuid,detail.getUsername());
 		if (store == null ) {
@@ -199,17 +207,15 @@ public class MusicController {
         String urlResource = "";
 
         if (appConstant.disableStream.equals("true")) {
-            urlResource = appConstant.hostAudio+"/stream/"+store.getId()+"/"+store.getFileHash()+"/"+music.getSlug()+".mp3";
+            urlResource = appConstant.hostServer+"stream/"+store.getId()+"/"+store.getFileHash()+"/"+music.getSlug()+".mp3";
         } else {
-            urlResource = amazonClientService.getResourceURL(fileService.getRealSong(music.getUUID())).toExternalForm();
-            if (urlResource != null){
-                urlResource =  urlResource.replace("https://","http://");
-            }
-        }
+            // urlResource = amazonClientService.getResourceURL(fileService.getRealSong(music.getUUID())).toExternalForm();
+            // if (urlResource != null){
+            //     urlResource =  urlResource.replace("https://","http://");
+            // }
+            urlResource = appConstant.hostAudio + fileService.getRealSong(music.getUUID());
+        }    
+            
         return new ApiResponse<>(0,AppConstant.SUCCESS_MESSAGE,urlResource);
     }
-
-
-
-
 }

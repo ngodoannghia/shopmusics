@@ -30,7 +30,7 @@ import org.apache.commons.io.FilenameUtils;
 
 @RestController
 public class UtilController {
-	private String save_data = "src/main/resources/static";
+	private String save_data = "/root/database/";
 	
     @Autowired
     UtilService utilService;
@@ -89,13 +89,14 @@ public class UtilController {
     
     
 	@PostMapping("/util/avatar/upload")
-    public ResponseEntity<?> saveAvater(@RequestParam("file") MultipartFile file) throws IOException {
+    public ResponseEntity<?> uploadAvatar(@RequestParam("file") MultipartFile file) throws IOException {
 		@SuppressWarnings("unused")
 		UserDetails detail = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		
 		boolean status_avatar = false;
 		String name_avatar = StringUtils.cleanPath(file.getOriginalFilename());	
-    	String path_avatar = "/avatars/" + UUID.randomUUID().toString() + "_" + name_avatar;  	
+        String ext = FilenameUtils.getExtension(name_avatar);
+    	String path_avatar = "static/avatars/" + UUID.randomUUID().toString() + '.' + ext;  	
 		try {
 	    	FileProcess obj_avatar = new FileProcess(save_data + path_avatar, file);
 	    	status_avatar = obj_avatar.saveFile();
@@ -114,43 +115,68 @@ public class UtilController {
     }
     
 
+    // @RequestMapping(value = "/util/avatar/{uuid}", method = RequestMethod.GET)
+    // public  @ResponseBody  StreamingResponseBody downloadAvatar(HttpServletResponse response, @PathVariable("uuid") String uuid, @RequestParam(name = "width",required = false) Integer width, @RequestParam(name = "height",required = false) Integer height) throws Exception {
+    //     String file = appConstant.photo+"/avatar."+uuid+".jpg";
+    //     try{
+    //         Long   fileSize = 0L;
+    //         StreamingResponseBody streamer = null;
+    //         if (cacheService.existCache(file)){
+    //            CacheService.CacheEntry cacheMeta = cacheService.getFileMeta(file);
+    //            fileSize = cacheMeta.getSize();
+    //            streamer = cacheService.getFile(file,fileSize );
+    //         } else {
+    //             fileSize = amazonClientService.fileSize(file);
+    //             S3ObjectInputStream finalObject = amazonClientService.getMusic( file );
+    //             if (cacheService.canSaveCache()){
+    //                 cacheService.saveCache(finalObject,file);
+    //                 streamer = cacheService.getFile(file,fileSize );
+    //             } else {
+    //                 streamer = output -> {
+    //                     int numberOfBytesToWrite = 0;
+    //                     byte[] data = new byte[1024];
+    //                     while ((numberOfBytesToWrite = finalObject.read(data, 0, data.length)) != -1) {
+    //                         output.write(data, 0, numberOfBytesToWrite);
+    //                     }
+    //                     finalObject.close();
+    //                 };
+    //             }
+    //         }
+    //     response.setHeader("Content-Length", fileSize.toString());
+    //     response.setHeader("Content-Disposition", "attachment; filename=\"avatar." + uuid + ".jpg\"");
+    //     return streamer;
+	// }catch (Exception e){
+
+    //         BufferedImage img = imageService.avatarLetterImage(uuid);
+    //         response.setHeader("Content-Disposition", "attachment; filename=\"letter.giay.jpg\"");
+    //         StreamingResponseBody streamer = outputStream -> ImageIO.write(img, "jpg", outputStream );
+    //         return streamer ;
+	//     }
+    // }
+
     @RequestMapping(value = "/util/avatar/{uuid}", method = RequestMethod.GET)
     public  @ResponseBody  StreamingResponseBody downloadAvatar(HttpServletResponse response, @PathVariable("uuid") String uuid, @RequestParam(name = "width",required = false) Integer width, @RequestParam(name = "height",required = false) Integer height) throws Exception {
-        String file = appConstant.photo+"/avatar."+uuid+".jpg";
-        try{
-            Long   fileSize = 0L;
-            StreamingResponseBody streamer = null;
-            if (cacheService.existCache(file)){
-               CacheService.CacheEntry cacheMeta = cacheService.getFileMeta(file);
-               fileSize = cacheMeta.getSize();
-               streamer = cacheService.getFile(file,fileSize );
-            } else {
-                fileSize = amazonClientService.fileSize(file);
-                S3ObjectInputStream finalObject = amazonClientService.getMusic( file );
-                if (cacheService.canSaveCache()){
-                    cacheService.saveCache(finalObject,file);
-                    streamer = cacheService.getFile(file,fileSize );
-                } else {
-                    streamer = output -> {
-                        int numberOfBytesToWrite = 0;
-                        byte[] data = new byte[1024];
-                        while ((numberOfBytesToWrite = finalObject.read(data, 0, data.length)) != -1) {
-                            output.write(data, 0, numberOfBytesToWrite);
-                        }
-                        finalObject.close();
-                    };
-                }
-            }
-        response.setHeader("Content-Length", fileSize.toString());
-        response.setHeader("Content-Disposition", "attachment; filename=\"avatar." + uuid + ".jpg\"");
-        return streamer;
-	}catch (Exception e){
+        String file = appConstant.hostImage + "static/avatar."+uuid+".jpg";
+      
+        Long   fileSize = 0L;
+        StreamingResponseBody streamer = null;
 
+        if (cacheService.existCache(file)){
+            CacheService.CacheEntry cacheMeta = cacheService.getFileMeta(file);
+            fileSize = cacheMeta.getSize();
+            streamer = cacheService.getFile(file,fileSize );
+
+            response.setHeader("Content-Length", fileSize.toString());
+            response.setHeader("Content-Disposition", "attachment; filename=\"avatar." + uuid + ".jpg\"");
+            return streamer;
+        }
+        else{
             BufferedImage img = imageService.avatarLetterImage(uuid);
             response.setHeader("Content-Disposition", "attachment; filename=\"letter.giay.jpg\"");
-            StreamingResponseBody streamer = outputStream -> ImageIO.write(img, "jpg", outputStream );
+            streamer = outputStream -> ImageIO.write(img, "jpg", outputStream );
             return streamer ;
-	    }
+        }
+
     }
 
 //    @PostMapping("/util/photo/upload")
@@ -191,7 +217,7 @@ public class UtilController {
 		boolean status_photo = false;
 		String name_photo = StringUtils.cleanPath(file.getOriginalFilename());
 		String ext = FilenameUtils.getExtension(name_photo);
-    	String path_photo = "/photo/" + UUID.randomUUID().toString() + "_" + UUID.randomUUID().toString() + '.' + ext;  	
+    	String path_photo = "static/photo/" + UUID.randomUUID().toString() + '.' + ext;  	
 		try {
 	    	FileProcess obj_photo = new FileProcess(save_data + path_photo, file);
 	    	status_photo = obj_photo.saveFile();
@@ -208,39 +234,60 @@ public class UtilController {
     		return ResponseEntity.ok(new ApiResponse<String>(1, AppConstant.BAD_REQUEST_MESSAGE,""));
     	}
     }
+    // @RequestMapping(value = "/util/photo/{uuid}", method = RequestMethod.GET)
+    // public   @ResponseBody  StreamingResponseBody  downloadPhoto(HttpServletResponse response, @PathVariable("uuid") String uuid, @RequestParam(name = "width",required = false) Integer width, @RequestParam(name = "height",required = false) Integer height) throws Exception {
+    //         String file = appConstant.photo+"/photo."+uuid+".jpg";
+    //     Long   fileSize = 0L;
+    //     StreamingResponseBody streamer = null;
+    //     if (cacheService.existCache(file)){
+    //         CacheService.CacheEntry cacheMeta = cacheService.getFileMeta(file);
+    //         fileSize = cacheMeta.getSize();
+    //         streamer = cacheService.getFile(file,fileSize );
+    //     } else {
+    //         fileSize = amazonClientService.fileSize(file);
+    //         S3ObjectInputStream finalObject = amazonClientService.getMusic( file );
+    //         if (cacheService.canSaveCache()){
+    //             cacheService.saveCache(finalObject,file);
+    //             streamer = cacheService.getFile(file,fileSize );
+   
+    //         } else {
+    //             streamer = output -> {
+    //                 int numberOfBytesToWrite = 0;
+    //                 byte[] data = new byte[1024];
+    //                 while ((numberOfBytesToWrite = finalObject.read(data, 0, data.length)) != -1) {
+    //                     output.write(data, 0, numberOfBytesToWrite);
+    //                 }
+    //                 finalObject.close();
+    //             };
+    //         }
+    //     }
+    //     response.setHeader("Content-Length", fileSize.toString());
+    //     response.setHeader("Content-Disposition", "attachment; filename=\"photo." + uuid + ".jpg\"");
+    //     return streamer;
+    // }
+
     @RequestMapping(value = "/util/photo/{uuid}", method = RequestMethod.GET)
     public   @ResponseBody  StreamingResponseBody  downloadPhoto(HttpServletResponse response, @PathVariable("uuid") String uuid, @RequestParam(name = "width",required = false) Integer width, @RequestParam(name = "height",required = false) Integer height) throws Exception {
-            String file = appConstant.photo+"/photo."+uuid+".jpg";
+        String file = appConstant.hostImage + "/photo." + uuid + ".jpg";
         Long   fileSize = 0L;
         StreamingResponseBody streamer = null;
         if (cacheService.existCache(file)){
             CacheService.CacheEntry cacheMeta = cacheService.getFileMeta(file);
             fileSize = cacheMeta.getSize();
             streamer = cacheService.getFile(file,fileSize );
-        } else {
-            fileSize = amazonClientService.fileSize(file);
-            S3ObjectInputStream finalObject = amazonClientService.getMusic( file );
-            if (cacheService.canSaveCache()){
-                cacheService.saveCache(finalObject,file);
-                streamer = cacheService.getFile(file,fileSize );
-   
-            } else {
-                streamer = output -> {
-                    int numberOfBytesToWrite = 0;
-                    byte[] data = new byte[1024];
-                    while ((numberOfBytesToWrite = finalObject.read(data, 0, data.length)) != -1) {
-                        output.write(data, 0, numberOfBytesToWrite);
-                    }
-                    finalObject.close();
-                };
-            }
+
+            response.setHeader("Content-Length", fileSize.toString());
+            response.setHeader("Content-Disposition", "attachment; filename=\"photo." + uuid + ".jpg\"");
+            return streamer;
+        } 
+        else{
+            BufferedImage img = imageService.avatarLetterImage(uuid);
+            response.setHeader("Content-Disposition", "attachment; filename=\"letter.giay.jpg\"");
+            streamer = outputStream -> ImageIO.write(img, "jpg", outputStream );
+            return streamer ;
         }
-        response.setHeader("Content-Length", fileSize.toString());
-        response.setHeader("Content-Disposition", "attachment; filename=\"photo." + uuid + ".jpg\"");
-        return streamer;
+
     }
-
-
 
     @SuppressWarnings({ "removal", "unused" })
 	@PostMapping("/util/music/upload/{uuid}")
@@ -255,10 +302,10 @@ public class UtilController {
         String urlMusic = "";
         if (music.getType() == AppConstant.MusicType.DEMO.getValue()){
             musicPath =  fileService.getDemoSong(music.getUUID());
-             urlMusic = constant.hostAudio+"/demo/stream/"+music.getUUID()+"/"+music.getSlug()+".mp3";
+            urlMusic = constant.hostAudio + "/demo/stream/" + music.getUUID() + "/" + music.getSlug() + ".mp3";
         } else {
             musicPath =  fileService.getRealSong(music.getUUID());
-            urlMusic = constant.hostAudio+"/admin/stream/"+music.getUUID()+"/"+music.getSlug()+".mp3";
+            urlMusic = constant.hostAudio + "/admin/stream/" + music.getUUID() + "/" + music.getSlug()+".mp3";
         }
         String urlTemp = appConstant.musicPath+ "/temp_"+UUID.randomUUID().toString()+".mp3";
         File fileTemp = new File(urlTemp);
@@ -285,7 +332,10 @@ public class UtilController {
         }
         cacheService.deleteCache(musicPath);
 
-        amazonClientService.uploadFileToRemotePrivate(musicPath, fileTemp );
+        // amazonClientService.uploadFileToRemotePrivate(musicPath, fileTemp );
+        FileProcess obj_music = new FileProcess(save_data + musicPath, file);
+        boolean status_music = obj_music.saveFile();
+
         cacheService.moveToCache(musicPath,fileTemp);
 
         return ResponseEntity.ok(new ApiResponse<String>(0, AppConstant.SUCCESS_MESSAGE,urlMusic));
@@ -304,17 +354,18 @@ public class UtilController {
     }
     @RequestMapping(value = "/utils/make_public/{uuid}", method = RequestMethod.GET)
     public   @ResponseBody  String makePublic(HttpServletResponse response, @PathVariable("uuid") String uuid) throws Exception {
-        amazonClientService.changeRoles(fileService.getRealSong(uuid));
+        // amazonClientService.changeRoles(fileService.getRealSong(uuid));
         return "ok";
     }
     @RequestMapping(value = "/utils/make_demo_public/{uuid}", method = RequestMethod.GET)
     public   @ResponseBody  String makeDemoPublic(HttpServletResponse response, @PathVariable("uuid") String uuid) throws Exception {
-        amazonClientService.changeRoles(fileService.getDemoSong(uuid));
+        // amazonClientService.changeRoles(fileService.getDemoSong(uuid));
         return "ok";
     }
     @RequestMapping(value = "/utils/get_public/{uuid}", method = RequestMethod.GET)
     public   @ResponseBody  String getPublicUrl(HttpServletResponse response, @PathVariable("uuid") String uuid) throws Exception {
-        return  amazonClientService.getResourceURL(fileService.getRealSong(uuid)).toExternalForm();
+        // return  amazonClientService.getResourceURL(fileService.getRealSong(uuid)).toExternalForm();
+        return appConstant.hostAudio + fileService.getRealSong(uuid);
     }
 
 }

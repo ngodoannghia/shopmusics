@@ -53,22 +53,20 @@ public class StreamController {
        /* if (userService.getStoreById(id) == null){
             return errorStream(response, slug);
         }*/
-        String file = fileService.getRealSong(uuid);
+        String file = appConstant.hostAudio + fileService.getRealSong(uuid);
         Long fileSize = 0l;
         StreamingResponseBody streamer;
-        Boolean hasCache = false;
-        if (cacheService.existCache(file)) {
-            fileSize = cacheService.getFileMeta(file).getSize();
-            hasCache = true;
-        } else {
-            //1p
-            cacheQueue.add(file,60l*60l*1000l);
-            if (amazonClientService.fileExist(file)) {
-                fileSize = amazonClientService.fileSize(file);
-            } else {
-                return errorStream(response, slug);
-            }
-        }
+        // if (cacheService.existCache(file)) {
+        fileSize = cacheService.getFileMeta(file).getSize();
+        // } else {
+        //     //1p
+        //     cacheQueue.add(file,60l*60l*1000l);
+        //     if (amazonClientService.fileExist(file)) {
+        //         fileSize = amazonClientService.fileSize(file);
+        //     } else {
+        //         return errorStream(response, slug);
+        //     }
+        // }
 
         response.setStatus(Response.SC_PARTIAL_CONTENT);
         response.setContentType("audio/mpeg"); 
@@ -78,19 +76,19 @@ public class StreamController {
         response.setHeader("Content-Disposition", "attachment; filename="+slug);
 
         if (range == null) {
-            if (hasCache){
-                streamer = cacheService.getFile(file,fileSize );
-            } else {
-                S3ObjectInputStream finalObject = amazonClientService.getMusic(file);
-                streamer = output -> {
-                    int numberOfBytesToWrite = 0;
-                    byte[] data = new byte[2048];
-                    while ((numberOfBytesToWrite = finalObject.read(data, 0, data.length)) != -1) {
-                        output.write(data, 0, numberOfBytesToWrite);
-                    }
-                    finalObject.close();
-                };
-            }
+            // if (hasCache){
+            streamer = cacheService.getFile(file,fileSize );
+            // } else {
+            //     S3ObjectInputStream finalObject = amazonClientService.getMusic(file);
+            //     streamer = output -> {
+            //         int numberOfBytesToWrite = 0;
+            //         byte[] data = new byte[2048];
+            //         while ((numberOfBytesToWrite = finalObject.read(data, 0, data.length)) != -1) {
+            //             output.write(data, 0, numberOfBytesToWrite);
+            //         }
+            //         finalObject.close();
+            //     };
+            // }
 			response.setHeader("Content-Length", fileSize.toString());
             return streamer;
 
@@ -108,19 +106,19 @@ public class StreamController {
         final String responseRange = String.format("bytes %d-%d/%d", from, to, fileSize);
 
         final int len = to - from + 1;
-        if (hasCache){
-            streamer = cacheService.getFile(file, new Long(from), new Long(to) );
-        } else {
-            S3ObjectInputStream finalObject = amazonClientService.getMusic(file, new Long(from), new Long(to));
-            streamer = output -> {
-                int numberOfBytesToWrite = 0;
-                byte[] data = new byte[2048];
-                while ((numberOfBytesToWrite = finalObject.read(data, 0, data.length)) != -1) {
-                    output.write(data, 0, numberOfBytesToWrite);
-                }
-                finalObject.close();
-            };
-        }
+        // if (hasCache){
+        streamer = cacheService.getFile(file, new Long(from), new Long(to) );
+        // } else {
+        //     S3ObjectInputStream finalObject = amazonClientService.getMusic(file, new Long(from), new Long(to));
+        //     streamer = output -> {
+        //         int numberOfBytesToWrite = 0;
+        //         byte[] data = new byte[2048];
+        //         while ((numberOfBytesToWrite = finalObject.read(data, 0, data.length)) != -1) {
+        //             output.write(data, 0, numberOfBytesToWrite);
+        //         }
+        //         finalObject.close();
+        //     };
+        // }
 
         response.setHeader("Content-Range", responseRange);
         response.setHeader("Content-Length", len + "");

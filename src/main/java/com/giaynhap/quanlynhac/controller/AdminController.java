@@ -21,6 +21,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.io.File;
 
 @RestController
 public class AdminController {
@@ -106,13 +107,13 @@ public class AdminController {
 
     @RequestMapping(value = "/admin/add", method = RequestMethod.POST)
     public ResponseEntity<ApiResponse<?>> addAdmin(@RequestBody Admin admin){
-//        UserDetails detail = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-//        if (admin.getAccount() == null || admin.getAccount().isEmpty()){
-//            return ResponseEntity.ok(new ApiResponse<>(1, AppConstant.ERROR_MESSAGE,null));
-//        }
-//        if (admin.getPassword() == null || admin.getPassword().isEmpty()){
-//            return ResponseEntity.ok(new ApiResponse<>(1, AppConstant.ERROR_MESSAGE,null));
-//        }
+       UserDetails detail = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+       if (admin.getUsername() == null || admin.getUsername().isEmpty()){
+           return ResponseEntity.ok(new ApiResponse<>(1, AppConstant.ERROR_MESSAGE,null));
+       }
+       if (admin.getPassword() == null || admin.getPassword().isEmpty()){
+           return ResponseEntity.ok(new ApiResponse<>(1, AppConstant.ERROR_MESSAGE,null));
+       }
         String hashString =  bHasher.hashToString(12,admin.getPassword().toCharArray());
         admin.setUUID(UUID.randomUUID().toString());
 		admin.setPassword(hashString);
@@ -123,13 +124,6 @@ public class AdminController {
     
     @RequestMapping(value = "/admin/signup", method = RequestMethod.POST)
     public ResponseEntity<ApiResponse<?>> signupAdmin(@RequestBody AdminDTO adminDTO){
-//        UserDetails detail = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-//        if (admin.getAccount() == null || admin.getAccount().isEmpty()){
-//            return ResponseEntity.ok(new ApiResponse<>(1, AppConstant.ERROR_MESSAGE,null));
-//        }
-//        if (admin.getPassword() == null || admin.getPassword().isEmpty()){
-//            return ResponseEntity.ok(new ApiResponse<>(1, AppConstant.ERROR_MESSAGE,null));
-//        }
     	Admin admin = new Admin();
         String hashString =  bHasher.hashToString(12,adminDTO.getPassword().toCharArray());
         admin.setUUID(UUID.randomUUID().toString());
@@ -190,9 +184,13 @@ public class AdminController {
         UserDetails detail = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         if (music.getType() == AppConstant.MusicType.ORIGIN.getValue()){
-            amazonClientService.deleteFileRemote(fileService.getDemoSong(music.getUUID()));
+            File myFile = new File(appConstant.hostAudio + fileService.getDemoSong(music.getUUID()));
+            myFile.delete();
+            // amazonClientService.deleteFileRemote(fileService.getDemoSong(music.getUUID()));
         } else if (music.getType() == AppConstant.MusicType.DEMO.getValue()){
-            amazonClientService.deleteFileRemote(fileService.getRealSong(music.getUUID()));
+            // amazonClientService.deleteFileRemote(fileService.getRealSong(music.getUUID()));
+            File myFile = new File(appConstant.hostAudio + fileService.getRealSong(music.getUUID()));
+            myFile.delete();
         }
         musicService.deleteMusic(music);
         adminSevice.writeLog("Delete music  "+ music.getTitle() +" - "+music.getUUID(), detail.getUsername());
@@ -310,8 +308,8 @@ public class AdminController {
         UserDetails detail = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         User user = userService.getUser(id);
         userService.deleteUser(id);
-        if (user != null && user.getAccount() != null) {
-            adminSevice.writeLog("Delete user "+ user.getAccount(), detail.getUsername());
+        if (user != null && user.getUsername() != null) {
+            adminSevice.writeLog("Delete user "+ user.getUsername(), detail.getUsername());
         } else {
             adminSevice.writeLog("Delete user "+ id, detail.getUsername());
         }
@@ -482,28 +480,18 @@ public class AdminController {
         }
 
         if (music.getType() == AppConstant.MusicType.DEMO.getValue()){
-            String urlResource = "";
-            if (appConstant.disableStream.equals("true")) {
-                urlResource = appConstant.hostAudio + "/demo/stream/" + music.getUUID() + "/" + music.getSlug() + ".mp3";
-            } else {
-                urlResource = amazonClientService.getResourceURL(fileService.getDemoSong(music.getUUID())).toExternalForm();
-                if (urlResource != null){
-                    urlResource =  urlResource.replace("https://","http://");
-                }
-            }
+            String urlResource = appConstant.hostAudio + fileService.getDemoSong(music.getUUID());
+
+            // urlResource = amazonClientService.getResourceURL(fileService.getDemoSong(music.getUUID())).toExternalForm();
+    
             return new ApiResponse<>(0,AppConstant.SUCCESS_MESSAGE,urlResource);
         }
 
-        String urlResource = "";
-
-        if (appConstant.disableStream.equals("true")) {
-            urlResource = appConstant.hostAudio+"/admin/stream/"+uuid+"/"+music.getSlug()+".mp3";
-        } else {
-            urlResource = amazonClientService.getResourceURL(fileService.getRealSong(music.getUUID())).toExternalForm();
-            if (urlResource != null){
-                urlResource =  urlResource.replace("https://","http://");
-            }
-        }
+        String urlResource = appConstant.hostAudio + fileService.getRealSong(uuid);
+        // urlResource = amazonClientService.getResourceURL(fileService.getRealSong(music.getUUID())).toExternalForm();
+        // if (urlResource != null){
+        //     urlResource =  urlResource.replace("https://","http://");
+        // }
         return new ApiResponse<>(0,AppConstant.SUCCESS_MESSAGE,urlResource);
     }
 
@@ -515,6 +503,4 @@ public class AdminController {
         adminSevice.writeLog("Delete pedding buy  "+uuid,detail.getUsername());
         return ResponseEntity.ok(new ApiResponse<>(0, AppConstant.SUCCESS_MESSAGE,null));
     }
-
-
 }

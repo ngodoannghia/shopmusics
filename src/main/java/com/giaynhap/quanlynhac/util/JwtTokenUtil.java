@@ -30,7 +30,7 @@ public class JwtTokenUtil implements Serializable {
         String userUUID =  claims.get("uuid",String.class);
         String userName = claims.get("username",String.class);
         User user = new User();
-        user.setAccount(userName);
+        user.setUsername(userName);
         user.setUUID(userUUID);
         return user;
     }
@@ -58,10 +58,10 @@ public class JwtTokenUtil implements Serializable {
     //generate token for user
     public String generateToken(User user) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("username",user.getAccount());
+        claims.put("username",user.getUsername());
         claims.put("uuid",user.getUUID());
         claims.put("admin",false);
-        return doGenerateToken(claims, user.getAccount());
+        return doGenerateToken(claims, user.getUsername());
     }
 
     public String generateToken(Admin user) {

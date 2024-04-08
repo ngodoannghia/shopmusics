@@ -10,9 +10,9 @@ public class FileService {
     AppConstant appConstant;
 
     public String getDemoSong(String uuid){
-        return "demo/"+uuid+".mp3";
+        return "static/musics/demo/"+uuid+".mp3";
     }
     public String getRealSong(String uuid){
-        return "song/"+uuid+".mp3";
+        return "static/musics/song/"+uuid+".mp3";
     }
 }

@@ -27,6 +27,8 @@ public class QuanlydataApplication  {
 	String username;
 	@Value("${spring.mail.password}")
 	String password;
+	@Value("${spring.mail.app2.password}")
+	String passwordApp2;
 	@Value("${spring.mail.transport.protocol}")
 	String protocol;
 	@Value("${spring.mail.smtp.starttls.enable}")
@@ -59,7 +61,7 @@ public class QuanlydataApplication  {
 		return taskScheduler;
 	}
 	@Bean
-	public JavaMailSender javaMailService() {
+	public JavaMailSender javaMailService1() {
 		JavaMailSenderImpl javaMailSender = new JavaMailSenderImpl();
 		javaMailSender.setHost(host);
 		javaMailSender.setPassword(password);
@@ -83,7 +85,30 @@ public class QuanlydataApplication  {
 		return javaMailSender;
 	}
 
+	@Bean
+	public JavaMailSender javaMailService2() {
+		JavaMailSenderImpl javaMailSender = new JavaMailSenderImpl();
+		javaMailSender.setHost(host);
+		javaMailSender.setPassword(passwordApp2);
+		javaMailSender.setUsername(username);
+		try {
+			javaMailSender.setPort(Integer.parseInt(port));
+		}catch (Exception e){
+			System.out.println("port "+port);
+			javaMailSender.setPort(587);
+		}
 
+		Properties mailProps = new Properties();
+		mailProps.put("mail.smtp.auth", auth);
+		mailProps.put("mail.transport.protocol", protocol);
+		mailProps.put("mail.smtp.starttls.enable", starttls);
+		mailProps.put("mail.smtp.connectiontimeout", 5000);
+		mailProps.put("mail.smtp.timeout", 5000);
+		mailProps.put("mail.smtp.writetimeout",5000);
+		javaMailSender.setJavaMailProperties(mailProps);
+
+		return javaMailSender;
+	}
 
 	public static void main(String[] args) {
 

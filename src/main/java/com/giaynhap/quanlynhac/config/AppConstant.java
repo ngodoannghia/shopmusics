@@ -21,6 +21,10 @@ public class AppConstant {
 
     @Value("${host.audio}")
     public String hostAudio;
+
+    @Value("${host.host}")
+    public String hostServer;
+
     @Value("${amazon.music}")
     public String music;
     @Value("${amazon.photo}")
@@ -31,6 +35,7 @@ public class AppConstant {
     public String musicStream;
     @Value("${giaynhap.stream.disable}")
     public String disableStream;
+
     public enum MusicType {
         ORIGIN(1), DEMO(2);
         private final int value;

@@ -11,6 +11,7 @@ public
 interface UserService{
     User getUser(String uuid);
     User getUserName(String username);
+    User getEmail(String email);
     User update(User users);
     UserInfo getUserInfo(String uuid);
     UserInfo updateUserInfo(UserInfo info);

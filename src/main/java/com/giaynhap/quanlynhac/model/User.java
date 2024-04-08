@@ -16,9 +16,11 @@ public class User {
     @Column(name = "uuid", length=100)
     private String UUID;
     @Column(name="username", length=255)
-    private String account;
+    private String username;
     @Column(name = "password", length=255)
     private  String password;
+    @Column(name = "email", length=255)
+    private String email;
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     @Column(name = "create_at")
@@ -39,12 +41,12 @@ public class User {
         this.UUID = UUID;
     }
 
-    public String getAccount() {
-        return account;
+    public String getUsername() {
+        return username;
     }
 
-    public void setAccount(String account) {
-        this.account = account;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getPassword() {
@@ -55,7 +57,14 @@ public class User {
         this.password = password;
     }
 
+    public String getEmail() {
+		return email;
+	}
 
+	public void setEmail(String email) {
+		this.email = email;
+	}
+    
     public boolean isEnable() {
         return enable;
     }

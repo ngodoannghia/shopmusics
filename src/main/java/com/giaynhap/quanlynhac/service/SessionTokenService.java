@@ -14,10 +14,10 @@ import java.util.Map;
 
 @Service
 public class SessionTokenService {
-    Map<String,String> tokens = new HashMap<>();
+    public Map<String,String> tokens = new HashMap<>();
     @Value("${jwt.secret}")
     private String secret;
-     public static class ObjectToken{
+    public static class ObjectToken{
         public String username;
         public String uuid;
         public Long createAt;
@@ -27,7 +27,7 @@ public class SessionTokenService {
     }
     public void addToken(String uuid,String token){
         tokens.put(uuid,token);
-	System.out.println("add token "+uuid+"   "+token);
+	    System.out.println("add token "+uuid+"   "+token);
     }
 
     public void deleteToken(String uuid){
@@ -50,21 +50,27 @@ public class SessionTokenService {
         if (!objToken.enable){
             return null;
         }
+
         return makeToken(objToken.username, objToken.uuid);
     }
     public ObjectToken validate(String token){
         System.out.println("Token validate  "+ token);
         if (!checkToken(token)){
-             System.out.println("Token not found");
+            System.out.println("Token not found");
             return null;
         }
         try {
 			ObjectToken objToken =  parseToken(token);
-			@SuppressWarnings("unused")
+
 			Long now =  LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+            if (now > objToken.expire){
+                System.out.println(" Token expired ");
+
+                return null;
+            }
             if (!objToken.enable){
-				 System.out.println(" token not enable ");
-				 System.out.println(token);
+				System.out.println(" token not enable ");
+				System.out.println(token);
 				 
                 return null;
             }

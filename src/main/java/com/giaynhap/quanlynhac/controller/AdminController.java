@@ -241,7 +241,7 @@ public class AdminController {
                 e.printStackTrace();
             }
         }
-            adminSevice.acceptPenddingBuy(uuid);
+        adminSevice.acceptPenddingBuy(uuid);
         if (detailBuy != null && detailBuy.getTitle() != null) {
             adminSevice.writeLog("Accept peddingbuy  "+ detailBuy.getTitle() +" - "+detailBuy.getUUID(), detail.getUsername());
         } else {

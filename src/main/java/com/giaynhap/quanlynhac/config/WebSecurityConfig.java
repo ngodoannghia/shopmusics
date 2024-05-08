@@ -11,10 +11,13 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.session.SessionRegistry;
+import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.session.HttpSessionEventPublisher;
 
 @Configuration
 @EnableWebSecurity
@@ -45,12 +48,19 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
     }
-
+    @Bean
+    public HttpSessionEventPublisher httpSessionEventPublisher() {
+        return new HttpSessionEventPublisher();
+    }
+    @Bean
+    public SessionRegistry sessionRegistry() {
+        return new SessionRegistryImpl();
+    }
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
 
         httpSecurity.cors().and().csrf().disable()
-                // dont authenticate this particular request
+        // dont authenticate this particular request
                 .authorizeRequests()
                 .antMatchers(
                         "/user/authenticate",
@@ -60,12 +70,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	                    "/admin/signup",
 	                    "/makepass/*",
 	                    "/user/register",
-	                    "/music/demo/*",
+	                    // "/music/demo/*",
 	                    "/music/detail/*",
 	                    "/music/detailbydemo/*",
-	                    "/music/getResource/*",
+	                    // "/music/getResource/*",
 	                    "/demo/stream/*/*",
 	                    "/admin/stream/*/*",
+                        "/music/stream/*/*",
 	                    "/user/info/*",
 	                    "/utils/letter/avatar/*",
 	                    "/util/photo/*",

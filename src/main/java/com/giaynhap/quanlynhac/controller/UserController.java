@@ -20,6 +20,10 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.UUID;
+import io.jsonwebtoken.Claims;
+import java.time.ZoneId;
+
+import com.giaynhap.quanlynhac.util.JwtTokenUtil;
 
 @RestController
 public class UserController {
@@ -37,6 +41,9 @@ public class UserController {
 
     @Autowired
     SessionTokenService sessionTokenService;
+
+    @Autowired
+    JwtTokenUtil jwtTokenUtil;
 
     @RequestMapping(value = "/users", method = RequestMethod.GET)
     public String test(){
@@ -56,12 +63,29 @@ public class UserController {
 			if (user == null || user.isEnable() != true){
 				return ResponseEntity.ok(new ApiResponse<AuthenResponse<User>>(1, AppConstant.ERROR_MESSAGE,null));
 			}
-			final String token = sessionTokenService.makeToken(user.getUsername(),user.getUUID());
-			sessionTokenService.addToken(user.getUUID(), token );
-			AuthenResponse<User> authenResponse = new AuthenResponse<User>(token);
-			user.setPassword("");
-			authenResponse.setUser(user);
-			return ResponseEntity.ok(new ApiResponse<AuthenResponse<User>>(0, AppConstant.SUCCESS_MESSAGE,authenResponse));
+            String current_token = user.getCurrentToken();
+
+            if (current_token != null){
+                SessionTokenService.ObjectToken objectToken = sessionTokenService.validate(current_token);
+
+                if (objectToken != null){
+                    sessionTokenService.deleteToken(objectToken.uuid);
+                }
+    
+            }
+
+            final String token = sessionTokenService.makeToken(user.getUsername(),user.getUUID());
+            sessionTokenService.addToken(user.getUUID(), token);
+            
+            User user_update = userService.getUser(user.getUUID());
+            user_update.setCurrentToken(token);
+            userService.update(user_update);
+
+            AuthenResponse<User> authenResponse = new AuthenResponse<User>(token);
+            user.setPassword("");
+            authenResponse.setUser(user);
+            return ResponseEntity.ok(new ApiResponse<AuthenResponse<User>>(0, AppConstant.SUCCESS_MESSAGE,authenResponse));
+
 		} catch (Exception e){
 			return ResponseEntity.ok(new ApiResponse<AuthenResponse<User>>(2, e.getMessage(),null));
 		}
@@ -130,7 +154,7 @@ public class UserController {
         String hashString =  bHasher.hashToString(12,user.getPassword().toCharArray());
         user.setPassword(hashString);
         user.setCreate_at(LocalDateTime.now());
-        user.setEnable(false);
+        user.setEnable(true);
         utilService.sendVeryEmail(sessionTokenService.makeToken(user.getUsername(),userInfo.getUUID(),false,"register"),user.getEmail(), user.getUsername());
         try {
             userService.update(user);

@@ -29,6 +29,10 @@ public class User {
     private  boolean enable;
     @Column(name = "ip_address", length=255)
     private  String ipAddress;
+    @Column(name = "current_token", length=255)
+    private String currentToken;
+    @Column(name = "expire_token")
+    private Long expireToken;
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "uuid", nullable=true)
     private UserInfo info;
@@ -95,4 +99,21 @@ public class User {
     public void setCreate_at(LocalDateTime create_at) {
         this.create_at = create_at;
     }
+
+    public String getCurrentToken() {
+        return currentToken;
+    }
+
+    public void setCurrentToken(String currentToken) {
+        this.currentToken = currentToken;
+    }
+
+    public Long getExpireToken() {
+        return expireToken;
+    }
+
+    public void setExpireToken(Long expireToken) {
+        this.expireToken = expireToken;
+    }
+    
 }

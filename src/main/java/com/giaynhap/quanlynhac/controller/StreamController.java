@@ -11,9 +11,13 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 import javax.servlet.http.HttpServletResponse;
 
+import java.io.*;
+
 @RestController
 public class StreamController {
     final int chunk_size = 1024 * 1024 * 5;
+
+    private String save_data = "/root/database/";
 
     @Autowired
     UserService userService;
@@ -297,5 +301,57 @@ public class StreamController {
       return streamer;
     }
 
+    @SuppressWarnings("removal")
+    @RequestMapping(value = "/music/stream/{uuid}/{slug}", method = RequestMethod.GET)
+        public  @ResponseBody
+        StreamingResponseBody getSongStream(HttpServletResponse response,
+                                      @PathVariable("uuid") String uuid,
+                                      @PathVariable("slug") String slug,
+                                      @RequestHeader(value = "Range",required = false) String range
+        ) throws Exception {
+    
+            String fileName = save_data + fileService.getRealSong(uuid);
+            File tmpFile = new File(fileName);
+            Long fileSize = 0l;
+            StreamingResponseBody streamer;
 
+            fileSize = tmpFile.length();
+
+            System.out.println("File size: " + fileSize);
+  
+            response.setStatus(Response.SC_PARTIAL_CONTENT);
+            response.setContentType("audio/mpeg"); 
+            response.setHeader("Accept-Ranges", "bytes"); 
+            response.setHeader("Cache-Control", "no-cache, no-store, max-age=0, must-revalidate");
+            response.setHeader("Last-Modified", "Mon, 26 Oct 2020 09:58:58 GMT"); 
+            response.setHeader("Content-Disposition", "attachment; filename="+slug);
+            if (range == null) {
+                RandomAccessFile fileAccess = new RandomAccessFile(fileName,"r");
+                streamer = new MediaStreamer(fileSize, fileAccess);
+                response.setHeader("Content-Length", fileSize.toString());
+                return streamer;
+            }
+            
+            String[] ranges = range.split("=")[1].split("-");
+            final int from = Integer.parseInt(ranges[0]);
+            int to = chunk_size + from;
+            if (to >= fileSize) {
+                to = (int) (fileSize - 1);
+            }
+            if (ranges.length == 2) {
+                to = Integer.parseInt(ranges[1]);
+            }
+    
+            final String responseRange = String.format("bytes %d-%d/%d", from, to, fileSize);
+            final int len = to - from + 1;
+
+            RandomAccessFile fileAccess = new RandomAccessFile(fileName,"r");
+            fileAccess.seek(new Long(from));
+            streamer = new MediaStreamer(new Long(to), fileAccess);
+
+    
+            response.setHeader("Content-Range", responseRange);
+            response.setHeader("Content-Length", len + "");
+            return streamer;
+        }
 }

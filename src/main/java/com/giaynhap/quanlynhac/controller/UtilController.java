@@ -35,8 +35,6 @@ public class UtilController {
     @Autowired
     UtilService utilService;
     @Autowired
-    AppConstant constant;
-    @Autowired
     ImageService imageService;
     @Autowired
     FileService fileService;
@@ -57,6 +55,7 @@ public class UtilController {
 		@SuppressWarnings("unused")
 		UserDetails detail = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		
+        UserInfo userInfo = userService.getUserInfo(detail.getUsername());
 		boolean status_avatar = false;
 		String name_avatar = StringUtils.cleanPath(file.getOriginalFilename());	
         String ext = FilenameUtils.getExtension(name_avatar);
@@ -64,14 +63,15 @@ public class UtilController {
 		try {
 	    	FileProcess obj_avatar = new FileProcess(save_data + path_avatar, file);
 	    	status_avatar = obj_avatar.saveFile();
-	    	
+            userInfo.setAvatar(appConstant.hostImage + path_avatar);
+            userService.updateUserInfo(userInfo);
 		} catch (Exception e) {
 	        System.out.println("save image error ");
 	        e.printStackTrace();
 		}
 		
     	if (status_avatar) {
-    		return ResponseEntity.ok(new ApiResponse<String>(0, AppConstant.SUCCESS_MESSAGE,path_avatar));
+    		return ResponseEntity.ok(new ApiResponse<String>(0, AppConstant.SUCCESS_MESSAGE,appConstant.hostImage + path_avatar));
     	}
     	else {
     		return ResponseEntity.ok(new ApiResponse<String>(1, AppConstant.BAD_REQUEST_MESSAGE,""));
@@ -165,10 +165,10 @@ public class UtilController {
         String urlMusic = "";
         if (music.getType() == AppConstant.MusicType.DEMO.getValue()){
             musicPath =  fileService.getDemoSong(music.getUUID());
-            urlMusic = constant.hostAudio + musicPath;
+            urlMusic = appConstant.hostAudio + musicPath;
         } else {
             musicPath =  fileService.getRealSong(music.getUUID());
-            urlMusic = constant.hostAudio + musicPath;
+            urlMusic = appConstant.hostAudio + musicPath;
         }
         String urlTemp = appConstant.musicPath+ "/temp_"+UUID.randomUUID().toString()+".mp3";
         File fileTemp = new File(urlTemp);

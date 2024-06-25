@@ -19,6 +19,7 @@ interface UserService{
     Page<Music> getUserStore(String userUUId, int page, int limit, Integer status);
     UserStore updateStore(UserStore store);
     void delStore(UserStore store);
+    void delMusicOfUser(String musicUUID,String userUUID);
     UserStore getStoreMusic(String musicUUID,String userUUID);
     List<UserStore> getAllStore(String userUUID);
     UserStore getStoreById(Long id);

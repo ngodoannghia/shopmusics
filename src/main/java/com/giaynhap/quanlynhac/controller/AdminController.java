@@ -377,7 +377,10 @@ public class AdminController {
     public ResponseEntity<ApiResponse<?>> removeUserStorage(  @PathVariable("id") String id,@PathVariable("uuid") String uuid ){
         UserDetails detail = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Music music = musicService.getMusic(id);
-        userService.delStore(userService.getStoreMusic(id, uuid));
+        // UserStore _userStore = userService.getStoreMusic(id, uuid);
+        // userService.delStore(userService.getStoreMusic(id, uuid));
+        userService.delMusicOfUser(id, uuid);
+        
         if (music != null && music.getTitle() != null) {
             adminSevice.writeLog("Remove user music" + music.getTitle(), detail.getUsername());
         } else {
@@ -398,7 +401,7 @@ public class AdminController {
     public ResponseEntity<ApiResponse<?>> getUserStorageDetail(@PathVariable("username") String username){
         @SuppressWarnings("unused")
 		UserDetails detail = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-	 User user =   userService.getUserName(username);
+	    User user =   userService.getUserName(username);
 
         return ResponseEntity.ok(new ApiResponse<>(0, AppConstant.SUCCESS_MESSAGE,user ));
     }

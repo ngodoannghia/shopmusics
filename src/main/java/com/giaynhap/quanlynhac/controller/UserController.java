@@ -134,6 +134,7 @@ public class UserController {
     @RequestMapping(value = "/user/register", method = RequestMethod.POST)
     public ResponseEntity<?>  register(@RequestBody User user){
         UserInfo userInfo = user.getInfo();
+        user.setUsername(user.getUsername().strip());
         User _user =  userService.getUserName(user.getUsername());
         if (_user  != null){
             return ResponseEntity.ok(new ApiResponse<User>(1, "Username existed",null));  

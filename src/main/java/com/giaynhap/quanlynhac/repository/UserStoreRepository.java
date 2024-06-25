@@ -44,4 +44,11 @@ public interface UserStoreRepository extends JpaRepository<UserStore, Long> {
     )
    void deleteByMusicId(@Param("music_id") String music);
 
+    @Modifying
+    @Transactional
+    @Query(
+        nativeQuery = true,
+        value = "delete from user_store where music_id = :music_id and user_id = :user_id "
+    )
+    void deleteMusicOfUser(@Param("music_id") String musicUUID, @Param("user_id") String userUUID);
 }

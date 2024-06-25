@@ -87,6 +87,11 @@ public class UserServiceIml implements UserService {
     }
 
     @Override
+    public void delMusicOfUser(String musicUUID,String userUUID) {
+        userStoreRepository.deleteMusicOfUser(musicUUID, userUUID);
+    }
+
+    @Override
     public UserStore getStoreMusic(String musicUUID,String userUUID){
 
 
